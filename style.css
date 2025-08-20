@@ -1,0 +1,16 @@
+body {
+  background-color: #f8f9fa;
+}
+#todo-list li.completed .todo-text {
+  text-decoration: line-through;
+  color: #6c757d;
+}
+#todo-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.todo-text {
+  flex: 1;
+  margin-left: 0.5rem;
+}
