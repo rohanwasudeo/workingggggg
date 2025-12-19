@@ -1,0 +1,26 @@
+body, html {
+  height: 100%;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container.main-content {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer {
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  font-size: 1rem;
+  color: #6c757d;
+  z-index: 10;
+  flex-shrink: 0;
+}
