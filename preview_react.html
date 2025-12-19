@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello World React App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+      body, html {
+        height: 100%;
+      }
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .container.main-content {
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .footer {
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        font-size: 1rem;
+        color: #6c757d;
+        z-index: 10;
+        flex-shrink: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+    <script type="text/babel">
+      const SUPABASE_URL = "https://ydmumpaarisrlnpybhcp.supabase.co";
+      const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkbXVtcGFhcmlzcmxucHliaGNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNjc5MjEsImV4cCI6MjA3Mjc0MzkyMX0.RFsW2XO3VxR-KoPjGLXfhLZs9gCoz--vGdlFI5hq6sQ";
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      function App() {
+        const [data, setData] = React.useState(null);
+        const [loading, setLoading] = React.useState(true);
+        const [error, setError] = React.useState(null);
+
+        React.useEffect(() => {
+          async function fetchData() {
+            setLoading(true);
+            setError(null);
+            // Fetch only mapped columns: message, footer
+            const { data, error } = await supabase
+              .from('message')
+              .select('message,footer');
+            if (error) {
+              setError(error.message);
+              setData(null);
+            } else {
+              setData(data);
+            }
+            setLoading(false);
+          }
+          fetchData();
+        }, []);
+
+        // Helper to get footer text
+        const getFooterText = () => {
+          if (loading) return '';
+          if (error) return '';
+          if (data && data.length === 1) {
+            return data[0].footer || <span className="text-muted">&copy; {new Date().getFullYear()} Hello World React App</span>;
+          }
+          if (data && data.length > 1) {
+            // If multiple rows, show first non-empty footer
+            const firstFooter = data.find(row => row.footer);
+            return firstFooter ? firstFooter.footer : <span className="text-muted">&copy; {new Date().getFullYear()} Hello World React App</span>;
+          }
+          return <span className="text-muted">&copy; {new Date().getFullYear()} Hello World React App</span>;
+        };
+
+        return (
+          <>
+            <div className="container main-content">
+              <div className="flex-grow-1 w-100 d-flex justify-content-center align-items-center">
+                <div className="text-center animate__animated animate__fadeIn w-100">
+                  {loading ? (
+                    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 150 }}>
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+                  ) : error ? (
+                    <div className="alert alert-danger" role="alert">{error}</div>
+                  ) : data && data.length === 1 ? (
+                    <h1 className="display-3 fw-bold mb-3">{data[0].message || <span className="text-muted">No message</span>}</h1>
+                  ) : data && data.length > 1 ? (
+                    <div className="table-responsive">
+                      <table className="table table-bordered table-hover align-middle">
+                        <thead className="table-light">
+                          <tr>
+                            <th scope="col">Message</th>
+                            <th scope="col">Footer</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {data.map((row, idx) => (
+                            <tr key={idx}>
+                              <td>{row.message ?? <span className="text-muted">N/A</span>}</td>
+                              <td>{row.footer ?? <span className="text-muted">N/A</span>}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <h1 className="display-3 fw-bold mb-3 text-muted">No message</h1>
+                  )}
+                </div>
+              </div>
+            </div>
+            <footer className="footer mt-auto py-3 w-100 bg-light border-top animate__animated animate__fadeInUp">
+              <div className="container text-center">
+                <span className="text-muted">{getFooterText()}</span>
+              </div>
+            </footer>
+          </>
+        );
+      }
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
